@@ -10,8 +10,10 @@ public class LoginView extends VBox {
 	public LoginView(Stage stage) {
 		setPadding(new Insets(24));
 		setSpacing(12);
+		setAlignment(javafx.geometry.Pos.CENTER);
+
 		
-		Label title = new Label("Login");
+		Label title = new Label("Study.io");
 		title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 		
 		TextField email = new TextField();
@@ -22,7 +24,7 @@ public class LoginView extends VBox {
 
         Label status = new Label();
 
-        Button loginBtn = new Button("Sign in");
+        Button loginBtn = new Button("log in");
         loginBtn.setDefaultButton(true);
         
         loginBtn.setOnAction(e -> {
