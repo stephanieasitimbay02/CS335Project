@@ -43,46 +43,37 @@ public class MainView extends BorderPane {
         calendarCard.setStyle("-fx-border-color: lightgray; -fx-border-radius: 8;");
         calendarCard.setPrefSize(520, 420);
 
-        // LEFT PANEL
-        VBox leftPanel = new VBox(12);
-        leftPanel.setPadding(new Insets(10));
-        leftPanel.setStyle("-fx-border-color: lightgray;");
+        // SIDEBAR
+        VBox sidebar = new VBox(12);
+        sidebar.setPadding(new Insets(10));
+        sidebar.setStyle("-fx-border-color: lightgray;");
+        
+        Button homeBtn = new Button("Home");
+        Button tasksBtn = new Button("Tasks");
+        Button notesBtn = new Button("Notes");
+        
+        homeBtn.setMaxWidth(Double.MAX_VALUE);
+        tasksBtn.setMaxWidth(Double.MAX_VALUE);
+        notesBtn.setMaxWidth(Double.MAX_VALUE);
 
-        // TODO LIST
-        Label todoLabel = new Label("To Do");
+        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage)));
+        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage)));
+        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage)));
 
-        TextField taskInput = new TextField();
-        taskInput.setPromptText("Enter a task");
+        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn);
 
-        Button addTask = new Button("Add Task");
-        Button deleteTask = new Button("Delete Selected Task");
+     // HOME CONTENT
+        VBox homeContent = new VBox(15);
+        homeContent.setPadding(new Insets(10));
+        homeContent.setStyle("-fx-border-color: lightgray;");
+        homeContent.setPrefWidth(300);
 
-        ListView<String> taskList = new ListView<>();
-
-        loadItems(taskList, TASK_FILE);
-
-        addTask.setOnAction(e -> {
-            String task = taskInput.getText();
-            if (!task.isEmpty()) {
-                taskList.getItems().add(task);
-                saveItems(taskList.getItems(), TASK_FILE);
-                taskInput.clear();
-            }
-        });
-
-        deleteTask.setOnAction(e -> {
-            String selected = taskList.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                taskList.getItems().remove(selected);
-                saveItems(taskList.getItems(), TASK_FILE);
-            }
-        });
-
-        HBox taskInputRow = new HBox(5, taskInput, addTask);
-
-        VBox todoBox = new VBox(5, todoLabel, taskInputRow, taskList, deleteTask);
+        Label welcomeLabel = new Label("Welcome to your dashboard");
+        welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         // POMODORO TIMER
+        Label pomodoroTitle = new Label("Pomodoro Timer");
+
         Label timerLabel = new Label("25:00");
         timerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
@@ -91,139 +82,48 @@ public class MainView extends BorderPane {
         Button resetTimer = new Button("Reset");
 
         final int[] timeSeconds = {1500};
+        final Timeline[] timeline = new Timeline[1];
 
-        Timeline timeline = new Timeline(
+        timeline[0] = new Timeline(
                 new KeyFrame(Duration.seconds(1), e -> {
-                    timeSeconds[0]--;
-                    int minutes = timeSeconds[0] / 60;
-                    int seconds = timeSeconds[0] % 60;
-                    timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+                    if (timeSeconds[0] > 0) {
+                        timeSeconds[0]--;
+                        int minutes = timeSeconds[0] / 60;
+                        int seconds = timeSeconds[0] % 60;
+                        timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+                    } else {
+                        timeline[0].stop();
+                    }
                 })
         );
 
-        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline[0].setCycleCount(Timeline.INDEFINITE);
 
-        startTimer.setOnAction(e -> timeline.play());
-        pauseTimer.setOnAction(e -> timeline.pause());
+        startTimer.setOnAction(e -> timeline[0].play());
+        pauseTimer.setOnAction(e -> timeline[0].pause());
         resetTimer.setOnAction(e -> {
-            timeline.stop();
+            timeline[0].stop();
             timeSeconds[0] = 1500;
             timerLabel.setText("25:00");
         });
 
         HBox timerButtons = new HBox(5, startTimer, pauseTimer, resetTimer);
 
-        VBox pomodoroBox = new VBox(5,
-                new Label("Pomodoro Timer"),
-                timerLabel,
-                timerButtons
-        );
+        VBox pomodoroBox = new VBox(8, pomodoroTitle, timerLabel, timerButtons);
+        pomodoroBox.setPadding(new Insets(10));
+        pomodoroBox.setStyle("-fx-border-color: lightgray;");
+        
+     // ADD CONTENT TO HOME CONTENT
+        homeContent.getChildren().addAll(welcomeLabel, pomodoroBox);
 
-        // NOTES
-        Label notesLabel = new Label("Notes");
-
-        TextArea noteInput = new TextArea();
-        noteInput.setPromptText("Write a note...");
-        noteInput.setPrefRowCount(3);
-
-        Button addNote = new Button("Add Note");
-        Button deleteNote = new Button("Delete Selected Note");
-
-        ListView<String> notesList = new ListView<>();
-
-        loadItems(notesList, NOTES_FILE);
-
-        addNote.setOnAction(e -> {
-            String note = noteInput.getText();
-            if (!note.isEmpty()) {
-                notesList.getItems().add(note);
-                saveItems(notesList.getItems(), NOTES_FILE);
-                noteInput.clear();
-            }
-        });
-
-        deleteNote.setOnAction(e -> {
-            String selected = notesList.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                notesList.getItems().remove(selected);
-                saveItems(notesList.getItems(), NOTES_FILE);
-            }
-        });
-
-        VBox notesBox = new VBox(5,
-                notesLabel,
-                noteInput,
-                addNote,
-                notesList,
-                deleteNote
-        );
-
-        // UPLOAD MEDIA
-        Label uploadLabel = new Label("Upload Media");
-
-        Button uploadButton = new Button("Choose File");
-
-        ListView<String> uploadedFiles = new ListView<>();
-
-        FileChooser fileChooser = new FileChooser();
-
-        uploadButton.setOnAction(e -> {
-            File file = fileChooser.showOpenDialog(stage);
-            if (file != null) {
-                uploadedFiles.getItems().add(file.getName());
-            }
-        });
-
-        VBox uploadBox = new VBox(5,
-                uploadLabel,
-                uploadButton,
-                uploadedFiles
-        );
-
-        leftPanel.getChildren().addAll(
-                todoBox,
-                pomodoroBox,
-                notesBox,
-                uploadBox
-        );
-
-        // SIDEBAR
-        VBox sidebar = new VBox(10);
-        sidebar.setPadding(new Insets(10));
-        sidebar.setPrefWidth(120);
-        sidebar.setStyle("-fx-border-color: lightgray;");
-
-        Button homeBtn = new Button("Home");
-        Button notesBtn = new Button("Notes");
-        Button uploadBtn = new Button("Upload");
-
-        sidebar.getChildren().addAll(homeBtn, notesBtn, uploadBtn);
-
-        // CENTER
-        HBox centerRow = new HBox(12, sidebar, leftPanel, calendarCard);
+        // CENTER LAYOUT
+        HBox centerRow = new HBox(12, sidebar, homeContent, calendarCard);
         centerRow.setAlignment(Pos.TOP_LEFT);
 
         setCenter(centerRow);
-
         setBottom(logout);
 
         BorderPane.setAlignment(header, Pos.CENTER);
         BorderPane.setAlignment(logout, Pos.CENTER);
-    }
-
-    private void saveItems(List<String> items, String filename) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            for (String item : items) {
-                writer.write(item);
-                writer.newLine();
-            }
-        } catch (IOException ignored) {}
-    }
-
-    private void loadItems(ListView<String> listView, String filename) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            List<String> lines = reader.lines().collect(Collectors.toList());
-            listView.getItems().addAll(lines);
-        } catch (IOException ignored) {}
     }
 }
