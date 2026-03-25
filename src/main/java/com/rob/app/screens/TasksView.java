@@ -42,16 +42,19 @@ public class TasksView extends BorderPane {
         Button homeBtn = new Button("Home");
         Button tasksBtn = new Button("Tasks");
         Button notesBtn = new Button("Notes");
+        Button coursesBtn = new Button("Courses");
 
         homeBtn.setMaxWidth(Double.MAX_VALUE);
         tasksBtn.setMaxWidth(Double.MAX_VALUE);
         notesBtn.setMaxWidth(Double.MAX_VALUE);
+        coursesBtn.setMaxWidth(Double.MAX_VALUE);
 
         homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage)));
         tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage)));
         notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage)));
+        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage)));
 
-        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn);
+        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn);
 
         // TASK CONTENT
         Label todoLabel = new Label("To Do");

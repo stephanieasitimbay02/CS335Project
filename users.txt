@@ -1,1 +1,3 @@
 newuser@gmail.com,hello!
+student@study.io,123456
+stephanie@test,678912
