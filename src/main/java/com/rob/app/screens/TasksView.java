@@ -12,11 +12,30 @@ import java.util.stream.Collectors;
 
 public class TasksView extends BorderPane {
 
-    private static final String TASK_FILE = "tasks.txt";
+    private String tasksFile;
+    private String userEmail;
 
-    public TasksView(Stage stage) {
+    public TasksView(Stage stage, String userEmail) {
         setPadding(new Insets(16));
         setStyle("-fx-background-color: #F5F7FA;");
+        
+        this.userEmail = userEmail;
+        String safeEmail = userEmail.replaceAll("[^a-zA-Z0-9]", "_");
+        File userDir = new File("users/" + safeEmail);
+        // creating folder if it doesn't already exist
+        if (!userDir.exists()) {
+        	userDir.mkdirs();
+        }
+        this.tasksFile = new File(userDir, "tasks.txt").getPath();
+        
+        File file = new File(tasksFile);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating tasks file");
+        }
 
         // HEADER
         Label header = new Label("Tasks");
@@ -51,13 +70,13 @@ public class TasksView extends BorderPane {
         inputRow.setAlignment(Pos.CENTER_LEFT);
 
         ListView<String> taskList = new ListView<>();
-        loadItems(taskList, TASK_FILE);
+        loadItems(taskList, tasksFile);
 
         addTaskBtn.setOnAction(e -> {
             String task = taskInput.getText().trim();
             if (!task.isEmpty()) {
                 taskList.getItems().add(task);
-                saveItems(taskList.getItems(), TASK_FILE);
+                saveItems(taskList.getItems(), tasksFile);
                 taskInput.clear();
             }
         });
@@ -67,7 +86,7 @@ public class TasksView extends BorderPane {
             String selected = taskList.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 taskList.getItems().remove(selected);
-                saveItems(taskList.getItems(), TASK_FILE);
+                saveItems(taskList.getItems(), tasksFile);
             }
         });
 
@@ -93,10 +112,10 @@ public class TasksView extends BorderPane {
             btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 10;");
         }
 
-        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage)));
-        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage)));
-        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage)));
-        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage)));
+        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage, userEmail)));
+        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage, userEmail)));
+        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage, userEmail)));
+        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage, userEmail)));
 
         sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn);
         return sidebar;

@@ -40,6 +40,7 @@ public class SignupView extends VBox {
 
             String userEmail = email.getText().trim();
             String userPassword = password.getText();
+            String safeEmail = userEmail.replaceAll("[^a-zA-Z0-9]", "_");
 
             if (userEmail.isEmpty() || userPassword.isEmpty()) {
                 status.setText("Please fill in all fields.");
@@ -79,6 +80,13 @@ public class SignupView extends VBox {
 
             try (FileWriter writer = new FileWriter("users.txt", true)) {
                 writer.write(userEmail + "," + userPassword + "\n");
+                // adding a folder to hold all separate user files
+                File userDir = new File("users/" + safeEmail);
+                // creating folder if it doesn't already exist
+                if (!userDir.exists()) {
+                	userDir.mkdirs();
+                }
+                
                 status.setStyle("-fx-text-fill: #4A90E2;");
                 status.setText("Account created! Go back and log in.");
             } catch (IOException ex) {

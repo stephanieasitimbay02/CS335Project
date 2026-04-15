@@ -12,11 +12,31 @@ import java.util.stream.Collectors;
 
 public class NotesView extends BorderPane {
 
-    private static final String NOTES_FILE = "notes.txt";
+    private String notesFile;
+    private String userEmail;
 
-    public NotesView(Stage stage) {
+    public NotesView(Stage stage, String userEmail) {
         setPadding(new Insets(16));
         setStyle("-fx-background-color: #F5F7FA;");
+        
+        this.userEmail = userEmail;
+        //sanitize email
+        String safeEmail = userEmail.replaceAll("[^a-zA-Z0-9]", "_");
+        File userDir = new File("users/" + safeEmail);
+        // creating folder if it doesn't already exist
+        if (!userDir.exists()) {
+        	userDir.mkdirs();
+        }
+        this.notesFile = new File(userDir, "notes.txt").getPath();
+        
+        File file = new File(notesFile);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating notes file");
+        }
 
         // HEADER
         Label header = new Label("Notes");
@@ -48,13 +68,13 @@ public class NotesView extends BorderPane {
 
         Button addNoteBtn = new Button("Add Note");
         ListView<String> notesList = new ListView<>();
-        loadItems(notesList, NOTES_FILE);
+        loadItems(notesList, notesFile);
 
         addNoteBtn.setOnAction(e -> {
             String note = noteInput.getText().trim();
             if (!note.isEmpty()) {
                 notesList.getItems().add(note);
-                saveItems(notesList.getItems(), NOTES_FILE);
+                saveItems(notesList.getItems(), notesFile);
                 noteInput.clear();
             }
         });
@@ -64,7 +84,7 @@ public class NotesView extends BorderPane {
             String selected = notesList.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 notesList.getItems().remove(selected);
-                saveItems(notesList.getItems(), NOTES_FILE);
+                saveItems(notesList.getItems(), notesFile);
             }
         });
 
@@ -90,10 +110,10 @@ public class NotesView extends BorderPane {
             btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 10;");
         }
 
-        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage)));
-        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage)));
-        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage)));
-        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage)));
+        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage, userEmail)));
+        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage, userEmail)));
+        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage, userEmail)));
+        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage, userEmail)));
 
         sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn);
         return sidebar;

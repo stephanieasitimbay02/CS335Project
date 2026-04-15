@@ -66,7 +66,7 @@ public class LoginView extends VBox {
             }
 
             if (authenticated) {
-                stage.getScene().setRoot(new MainView(stage));
+                stage.getScene().setRoot(new MainView(stage, userEmail));
             } else {
                 status.setText("Invalid email or password.");
             }

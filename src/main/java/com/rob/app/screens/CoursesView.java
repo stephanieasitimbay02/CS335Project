@@ -7,6 +7,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import java.io.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class CoursesView extends BorderPane {
@@ -16,13 +19,32 @@ public class CoursesView extends BorderPane {
     private Label instructorValue;
     private Label weeklyScheduleValue;
     private Label courseInfoValue;
+    private String userEmail;
+    private String coursesFile;
 
 	
 	
-	public CoursesView(Stage stage) {
+	public CoursesView(Stage stage, String userEmail) {
         setPadding(new Insets(16));
         setStyle("-fx-background-color: #F5F7FA;");
-
+        this.userEmail = userEmail;
+        String safeEmail = userEmail.replaceAll("[^a-zA-Z0-9]", "_");
+        File userDir = new File("users/" + safeEmail);
+        // creating folder if it doesn't already exist
+        if (!userDir.exists()) {
+        	userDir.mkdirs();
+        }
+        this.coursesFile = new File(userDir, "courses.txt").getPath();
+        
+        File file = new File(coursesFile);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating courses file");
+        }
+        
         // HEADER
         Label header = new Label("Courses");
         header.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #4A6FA5;");
@@ -266,10 +288,10 @@ public class CoursesView extends BorderPane {
             );
         }
 
-        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage)));
-        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage)));
-        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage)));
-        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage)));
+        homeBtn.setOnAction(e -> stage.getScene().setRoot(new MainView(stage, userEmail)));
+        tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage, userEmail)));
+        notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage, userEmail)));
+        coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage, userEmail)));
 
         sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn);
         return sidebar;
