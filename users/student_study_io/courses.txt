@@ -1,0 +1,2 @@
+CS335||Carroll||Mon/Wed/Fri||software engineering
+Math343||Deighton||Mon/Wed/Fri||math modeling
