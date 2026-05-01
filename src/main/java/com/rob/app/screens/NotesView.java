@@ -96,7 +96,7 @@ public class NotesView extends BorderPane {
     }
 
     private VBox createSidebar(Stage stage) {
-        VBox sidebar = new VBox(12);
+    	VBox sidebar = new VBox(12);
         sidebar.setPadding(new Insets(10));
         sidebar.setStyle("-fx-background-color: #4A6FA5; -fx-padding: 15; -fx-border-radius: 10;");
 
@@ -104,8 +104,9 @@ public class NotesView extends BorderPane {
         Button tasksBtn = new Button("Tasks");
         Button notesBtn = new Button("Notes");
         Button coursesBtn = new Button("Courses");
+        Button settingsBtn = new Button("Settings");
 
-        for (Button btn : new Button[]{homeBtn, tasksBtn, notesBtn, coursesBtn}) {
+        for (Button btn : new Button[]{homeBtn, tasksBtn, notesBtn, coursesBtn, settingsBtn}) {
             btn.setMaxWidth(Double.MAX_VALUE);
             btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 10;");
         }
@@ -114,8 +115,9 @@ public class NotesView extends BorderPane {
         tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage, userEmail)));
         notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage, userEmail)));
         coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage, userEmail)));
+        settingsBtn.setOnAction(e -> stage.getScene().setRoot(new SettingsView(stage, userEmail)));
 
-        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn);
+        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn, settingsBtn);
         return sidebar;
     }
 

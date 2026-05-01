@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 public class TasksView extends BorderPane {
 
@@ -62,22 +63,41 @@ public class TasksView extends BorderPane {
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
 
         TextField taskInput = new TextField();
+        DatePicker dueDatePicker = new DatePicker();
         taskInput.setPromptText("Enter a task");
+        dueDatePicker.setPromptText("Due date");
         taskInput.setPrefWidth(250);
-
+        
         Button addTaskBtn = new Button("Add");
-        HBox inputRow = new HBox(8, taskInput, addTaskBtn);
+        HBox inputRow = new HBox(8, taskInput, dueDatePicker, addTaskBtn);
         inputRow.setAlignment(Pos.CENTER_LEFT);
 
         ListView<String> taskList = new ListView<>();
+        taskList.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String[] parts = item.split("\\|");
+                    setText(parts[0] + " (Due: " + parts[1] + ")");
+                }
+            }
+        });
         loadItems(taskList, tasksFile);
+        
 
         addTaskBtn.setOnAction(e -> {
             String task = taskInput.getText().trim();
-            if (!task.isEmpty()) {
-                taskList.getItems().add(task);
+            LocalDate date = dueDatePicker.getValue();
+            if (!task.isEmpty()&& date != null) {
+                String formatted = task + "|" + date.toString();
+                taskList.getItems().add(formatted);
                 saveItems(taskList.getItems(), tasksFile);
+
                 taskInput.clear();
+                dueDatePicker.setValue(null);
             }
         });
 
@@ -98,7 +118,7 @@ public class TasksView extends BorderPane {
     }
 
     private VBox createSidebar(Stage stage) {
-        VBox sidebar = new VBox(12);
+    	VBox sidebar = new VBox(12);
         sidebar.setPadding(new Insets(10));
         sidebar.setStyle("-fx-background-color: #4A6FA5; -fx-padding: 15; -fx-border-radius: 10;");
 
@@ -106,8 +126,9 @@ public class TasksView extends BorderPane {
         Button tasksBtn = new Button("Tasks");
         Button notesBtn = new Button("Notes");
         Button coursesBtn = new Button("Courses");
+        Button settingsBtn = new Button("Settings");
 
-        for (Button btn : new Button[]{homeBtn, tasksBtn, notesBtn, coursesBtn}) {
+        for (Button btn : new Button[]{homeBtn, tasksBtn, notesBtn, coursesBtn, settingsBtn}) {
             btn.setMaxWidth(Double.MAX_VALUE);
             btn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: center-left; -fx-padding: 10;");
         }
@@ -116,8 +137,9 @@ public class TasksView extends BorderPane {
         tasksBtn.setOnAction(e -> stage.getScene().setRoot(new TasksView(stage, userEmail)));
         notesBtn.setOnAction(e -> stage.getScene().setRoot(new NotesView(stage, userEmail)));
         coursesBtn.setOnAction(e -> stage.getScene().setRoot(new CoursesView(stage, userEmail)));
+        settingsBtn.setOnAction(e -> stage.getScene().setRoot(new SettingsView(stage, userEmail)));
 
-        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn);
+        sidebar.getChildren().addAll(homeBtn, tasksBtn, notesBtn, coursesBtn, settingsBtn);
         return sidebar;
     }
 

@@ -1,2 +1,4 @@
 CS335||Carroll||Mon/Wed/Fri||software engineering
 Math343||Deighton||Mon/Wed/Fri||math modeling
+PH 241||Edima Ottoho||Tue||Health, Illness and Society
+A-330

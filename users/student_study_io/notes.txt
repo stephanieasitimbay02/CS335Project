@@ -1,1 +1,18 @@
-student
+CS332 Summative Assignment Topics:
+- Backtracking, 
+- Use of the Master Method,
+- Minimal Spanning Trees
+CS335 Presentation Talking Points:
+- What is Study.io?
+- Why Study.io?
+- Design Process
+- Code Overview
+- Project Demo
+- Future of Study.io
+Math Presentation topics:
+- motivation
+- model overview
+- parameters
+- reproduction number
+- visuals
+- conclusions

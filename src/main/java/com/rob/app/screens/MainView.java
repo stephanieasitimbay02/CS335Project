@@ -9,6 +9,11 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import com.calendarfx.view.CalendarView;
+import com.calendarfx.model.Calendar;
+import com.calendarfx.model.CalendarSource;
+import java.io.*;
+import java.time.LocalDate;
+import com.calendarfx.model.Entry;
 
 
 public class MainView extends BorderPane {
@@ -22,6 +27,9 @@ public class MainView extends BorderPane {
         setStyle("-fx-background-color: #F5F7FA;");
         
         this.userEmail = userEmail;
+        String safeEmail = userEmail.replaceAll("[^a-zA-Z0-9]", "_");
+        File userDir = new File("users/" + safeEmail);
+        String tasksFile = new File(userDir, "tasks.txt").getPath();
 
         // HEADER
         Label header = new Label("Home");
@@ -47,6 +55,15 @@ public class MainView extends BorderPane {
         calendarCard.setPadding(new Insets(10));
         calendarCard.setStyle("-fx-border-color: #E0E0E0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white;");
         calendarCard.setPrefSize(520, 420);
+        Calendar calendar = new Calendar("Tasks");
+        calendar.setStyle(Calendar.Style.STYLE1);
+
+        CalendarSource source = new CalendarSource("My Calendars");
+        source.getCalendars().add(calendar);
+
+        calendarView.getCalendarSources().add(source);
+        
+        loadTasksToCalendar(calendar, tasksFile);
 
         // HOME CONTENT
         VBox homeContent = new VBox(15);
@@ -133,5 +150,29 @@ public class MainView extends BorderPane {
         int m = seconds / 60;
         int s = seconds % 60;
         return String.format("%02d:%02d", m, s);
+    }
+    
+    private void loadTasksToCalendar(Calendar calendar, String tasksFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(tasksFile))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+
+                if (parts.length == 2) {
+                    String title = parts[0];
+                    LocalDate date = LocalDate.parse(parts[1]);
+
+                    Entry<String> entry = new Entry<>(title);
+                    entry.changeStartDate(date);
+                    entry.changeEndDate(date);
+
+                    calendar.addEntry(entry);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
