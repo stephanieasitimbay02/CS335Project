@@ -35,8 +35,6 @@ public class SettingsView extends BorderPane {
             "-fx-background-radius: 10;" +
             "-fx-background-color: white;"
         );
-        
-        
 
         Label accountTitle = new Label("Account Settings");
         accountTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
@@ -45,46 +43,14 @@ public class SettingsView extends BorderPane {
         TextField emailField = new TextField(userEmail);
         emailField.setEditable(false);
 
-        Label themeLabel = new Label("Theme:");
-        ComboBox<String> themeBox = new ComboBox<>();
-        themeBox.getItems().addAll("Light", "Dark");
-        themeBox.setValue("Light");
         Label notificationLabel = new Label("Notifications:");
         CheckBox notificationsCheckBox = new CheckBox("Enable reminders and notifications");
         notificationsCheckBox.setSelected(true);
-        
-        themeBox.setOnAction(e -> {
-            String selectedTheme = themeBox.getValue();
 
-            if (selectedTheme.equals("Dark")) {
-                applyDarkMode();
-                settingsContent.setStyle(
-                    "-fx-border-color: #444;" +
-                    "-fx-border-radius: 10;" +
-                    "-fx-background-radius: 10;" +
-                    "-fx-background-color: #2B2B2B;"
-                );
-                accountTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
-                emailLabel.setStyle("-fx-text-fill: white;");
-                themeLabel.setStyle("-fx-text-fill: white;");
-                notificationLabel.setStyle("-fx-text-fill: white;");
-                notificationsCheckBox.setStyle("-fx-text-fill: white;");
-            } else {
-                applyLightMode();
-                settingsContent.setStyle(
-                    "-fx-border-color: #E0E0E0;" +
-                    "-fx-border-radius: 10;" +
-                    "-fx-background-radius: 10;" +
-                    "-fx-background-color: white;"
-                );
-                accountTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
-                emailLabel.setStyle("-fx-text-fill: #333;");
-                themeLabel.setStyle("-fx-text-fill: #333;");
-                notificationLabel.setStyle("-fx-text-fill: #333;");
-                notificationsCheckBox.setStyle("-fx-text-fill: #333;");
-            }
-        });
-
+        Label reminderFrequencyLabel = new Label("Reminder Frequency:");
+        ComboBox<String> reminderFrequencyBox = new ComboBox<>();
+        reminderFrequencyBox.getItems().addAll("Daily", "Weekdays Only", "Weekly", "Off");
+        reminderFrequencyBox.setValue("Daily");
 
         Button saveBtn = new Button("Save Settings");
         saveBtn.setStyle("-fx-background-color: #4A6FA5; -fx-text-fill: white; -fx-font-weight: bold;");
@@ -92,11 +58,13 @@ public class SettingsView extends BorderPane {
         Label statusLabel = new Label();
 
         saveBtn.setOnAction(e -> {
-            String selectedTheme = themeBox.getValue();
             boolean notificationsOn = notificationsCheckBox.isSelected();
+            String selectedReminderFrequency = reminderFrequencyBox.getValue();
 
-            statusLabel.setText("Settings saved: Theme = " + selectedTheme +
-                    ", Notifications = " + (notificationsOn ? "On" : "Off"));
+            statusLabel.setText("Settings saved: Notifications = " +
+                    (notificationsOn ? "On" : "Off") +
+                    ", Reminder Frequency = " + selectedReminderFrequency);
+
             statusLabel.setStyle("-fx-text-fill: green;");
         });
 
@@ -104,10 +72,10 @@ public class SettingsView extends BorderPane {
                 accountTitle,
                 emailLabel,
                 emailField,
-                themeLabel,
-                themeBox,
                 notificationLabel,
                 notificationsCheckBox,
+                reminderFrequencyLabel,
+                reminderFrequencyBox,
                 saveBtn,
                 statusLabel
         );
@@ -116,14 +84,6 @@ public class SettingsView extends BorderPane {
         centerRow.setAlignment(Pos.TOP_LEFT);
 
         setCenter(centerRow);
-    }
-    
-    private void applyLightMode() {
-        setStyle("-fx-background-color: #F5F7FA;");
-    }
-
-    private void applyDarkMode() {
-        setStyle("-fx-background-color: #1E1E1E;");
     }
 
     private VBox createSidebar(Stage stage, String userEmail) {
